@@ -5,6 +5,7 @@ class NetworkPacket {
     lifetime: number;
     option: NetworkPacketOptions;
     payload: any;
+    progress: number;
 }
 
 enum NetworkPacketOptions {
