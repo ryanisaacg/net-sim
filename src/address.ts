@@ -30,3 +30,5 @@ class Address {
             this.node == other.node
     }
 }
+
+export default Address

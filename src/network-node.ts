@@ -1,3 +1,7 @@
+import Address from './address'
+import NetworkPacket from './network-packet'
+import Pipe from './pipe'
+
 class NetworkNode {
     parent?: Pipe;
     peers: Pipe[] = [];
@@ -72,3 +76,5 @@ class NetworkNode {
         }
     }
 }
+
+export default NetworkNode

@@ -1,3 +1,5 @@
+import Address from './address'
+
 class NetworkPacket {
     source: Address;
     dest: Address;
@@ -14,3 +16,4 @@ class NetworkPacket {
     }
 }
 
+export default NetworkPacket;

@@ -1,3 +1,6 @@
+import NetworkNode from './network-node'
+import NetworkPacket from './network-packet'
+
 class Pipe {
     length: number;
     start: NetworkNode;
@@ -25,3 +28,5 @@ class Pipe {
         this.networkPackets = inProgress;
     }
 }
+
+export default Pipe
