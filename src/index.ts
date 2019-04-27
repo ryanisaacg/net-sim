@@ -68,6 +68,14 @@ const updateNode = function (node: NetworkNode) {
     })
 };
 
+let hosts = network.filter((node) => node.addr.node);
+let host = hosts[0]
+let target = hosts[1]
+const toTarget = new TcpConnection(host, target);
+const toHost = new TcpConnection(target, host);
+toTarget.write("Yo can I get uhhh BONELESS PIZZA.");
+tcpConnections.push([toTarget, toHost])
+
 setInterval(update, 20);
 function update () {
     tcpConnections.forEach(([a, b]) => {
@@ -81,7 +89,7 @@ function update () {
 
     renderer.updateSimulation(region);
 
-    let hosts = network.filter((node) => node.addr.node);
+    /*let hosts = network.filter((node) => node.addr.node);
     hosts.forEach((host) => {
         if(Math.random() < 0.001 && tcpConnections.length < 16) {
             let target = hosts[Math.floor(Math.random() * hosts.length)];
@@ -90,5 +98,5 @@ function update () {
             toTarget.write("Yo can I get uhhh BONELESS PIZZA.");
             tcpConnections.push([toTarget, toHost])
         }
-    });
+    });*/
 }
