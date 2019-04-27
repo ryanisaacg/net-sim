@@ -49,7 +49,10 @@ class Renderer {
     }
 
     updateSimulation(root: NetworkNode) {
-        this.scene = new Scene();
+        this.scene.children.forEach(mesh => {
+            mesh.dispose();
+            scene.remove(mesh);
+        })
         this.addNode(root)
     }
 
