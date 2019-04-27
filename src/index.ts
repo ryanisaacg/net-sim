@@ -1,8 +1,9 @@
 import NetworkNode from './network-node';
-import NetworkPacket from './network-packet';
+//import NetworkPacket from './network-packet';
 import Address from './address';
 import Renderer from './renderer';
 import Point from './point';
+import TcpConnection from './tcp-connection'
 
 const renderer = new Renderer();
 
@@ -44,6 +45,8 @@ network.push(new NetworkNode(new Point(250, -100), c1));
 network.push(new NetworkNode(new Point(200, -150), c1));
 network.push(new NetworkNode(new Point(150, -200), c2));
 
+let tcpConnections: TcpConnection[][] = []
+
 renderer.updateSimulation(region);
 
 const render = function () {
@@ -67,14 +70,25 @@ const updateNode = function (node: NetworkNode) {
 
 setInterval(update, 20);
 function update () {
+    tcpConnections.forEach(([a, b]) => {
+        a.tick();
+        b.tick();
+    })
+    //const completed = tcpConnections.filter(([a, b]) => a.completed() || b.completed())
+    tcpConnections = tcpConnections.filter(([a, b]) => !(a.completed() || b.completed()))
+
     updateNode(region);
+
     renderer.updateSimulation(region);
+
     let hosts = network.filter((node) => node.addr.node);
     hosts.forEach((host) => {
-        if(Math.random() < 0.001) {
+        if(Math.random() < 0.001 && tcpConnections.length < 16) {
             let target = hosts[Math.floor(Math.random() * hosts.length)];
-            host.enqueuePacket(new NetworkPacket(host.addr, target.addr, "Henwo"));
-            host.enqueuePacket(new NetworkPacket(host.addr, target.addr, "Wowwd"));
+            const toTarget = new TcpConnection(host, target);
+            const toHost = new TcpConnection(target, host);
+            toTarget.write("Yo can I get uhhh BONELESS PIZZA.");
+            tcpConnections.push([toTarget, toHost])
         }
     });
 }
