@@ -5,12 +5,14 @@ class NetworkPacket {
     dest: Address;
     payload: any;
     progress: number;
+    distanceTraveled: number;
 
     constructor(source: Address, dest: Address, payload: any) {
         this.source = source;
         this.dest = dest;
         this.payload = payload;
         this.progress = 0;
+        this.distanceTraveled = 0;
     }
 }
 

@@ -19,10 +19,14 @@ class Pipe {
     }
 
     tick() {
-        this.networkPackets.forEach(packet => packet.progress += 2);
+        this.networkPackets.forEach(packet => {
+            packet.progress += 2;
+            packet.distanceTraveled += 2;
+        });
 
         const completed = this.networkPackets.filter(packet => packet.progress >= this.length);
         completed.forEach((packet) => {
+            packet.distanceTraveled -= (packet.progress - this.length);
             this.end.enqueuePacket(packet);
             this.networkPackets.splice(this.networkPackets.indexOf(packet), 1);
         });
