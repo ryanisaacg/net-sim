@@ -1,4 +1,4 @@
-import { BoxGeometry, Geometry, Line, LineBasicMaterial, Mesh, MeshBasicMaterial, Object3D,
+import { BoxGeometry, Geometry, Line, LineBasicMaterial, Mesh, MeshBasicMaterial,
     PerspectiveCamera, Scene, WebGLRenderer, Vector3 } from 'three';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
 import { OBJLoader } from 'three/examples/jsm/loaders/OBJLoader';
@@ -7,15 +7,14 @@ import Pipe from './pipe'
 
 const NODE_MATERIAL = new MeshBasicMaterial( { color: "#FFFFFF" } );
 
-let ROUTER: Object3D = new Mesh(new BoxGeometry( 1, 1, 1 ), NODE_MATERIAL);
+let ROUTER = new Mesh(new BoxGeometry( 1, 1, 1 ), NODE_MATERIAL);
 
 const loader = new OBJLoader();
 loader.load(
     'models/router.obj',
     (model) => {
-        ROUTER = model;
-        ROUTER.children[0].material = NODE_MATERIAL;
-        console.log(ROUTER)
+        ROUTER = <Mesh>model.children[0];
+        ROUTER.material = NODE_MATERIAL;
     }
 );
 
@@ -56,7 +55,7 @@ class Renderer {
 
     addNode(root: NetworkNode) {
         // Create a Cube Mesh with basic material
-        const cube = ROUTER.clone();
+        const cube = new Mesh(ROUTER.geometry, ROUTER.material);
         cube.translateX(root.pos.x);
         cube.translateZ(-root.pos.y);
 
