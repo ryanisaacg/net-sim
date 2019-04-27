@@ -62,7 +62,13 @@ class Renderer {
         // Add cube to Scene
         this.scene.add(cube);
 
-        root.children.forEach((pipe) => this.addPipe(pipe));
+        root.children.forEach((pipe) => {
+            this.addPipe(pipe);
+            this.addNode(pipe.end);
+        });
+        root.peers.forEach((pipe) => {
+            this.addPipe(pipe);
+        })
     }
 
     addPipe(pipe: Pipe) {
@@ -73,8 +79,6 @@ class Renderer {
         points.vertices.push(new Vector3(start.x, 0, -start.y));
         points.vertices.push(new Vector3(end.x, 0, -end.y));
         this.scene.add(new Line(points, PIPE_MATERIAL));
-
-        this.addNode(pipe.end)
     }
 }
 
