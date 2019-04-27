@@ -19,7 +19,7 @@ class Pipe {
     }
 
     tick() {
-        this.networkPackets.forEach(packet => packet.progress += 1);
+        this.networkPackets.forEach(packet => packet.progress += 2);
 
         const completed = this.networkPackets.filter(packet => packet.progress >= this.length);
         completed.forEach((packet) => {

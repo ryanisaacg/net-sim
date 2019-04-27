@@ -65,7 +65,7 @@ const updateNode = function (node: NetworkNode) {
     })
 };
 
-setInterval(update, 100);
+setInterval(update, 20);
 function update () {
     updateNode(region);
     renderer.updateSimulation(region);
