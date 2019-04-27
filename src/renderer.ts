@@ -102,7 +102,6 @@ class Renderer {
         const start = pointToVec(pipe.start.pos);
         const end = pointToVec(pipe.end.pos);
         const position = start.lerp(end, packet.progress / pipe.length);
-        console.log(position);
 
         const packetMesh = new Mesh(PACKET.geometry, PACKET.material);
         translateMesh(packetMesh, position);
