@@ -1,0 +1,12 @@
+# Blender MTL File: 'router.blend'
+# Material Count: 1
+
+newmtl RouterMaterial
+Ns 96.078431
+Ka 0.314286 0.314286 0.314286
+Kd 0.615258 0.615258 0.615258
+Ks 0.500000 0.500000 0.500000
+Ke 0.376000 0.376000 0.376000
+Ni 1.000000
+d 1.000000
+illum 0

@@ -15,6 +15,7 @@ renderer.updateSimulation(rootNode);
 
 const render = function () {
     requestAnimationFrame( render );
+    renderer.updateSimulation(rootNode);
     renderer.render();
 };
 
