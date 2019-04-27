@@ -1,18 +1,51 @@
-import { Scene } from 'three'
-import Address from './address'
+import { Scene, PerspectiveCamera, WebGLRenderer, BoxGeometry, MeshBasicMaterial, Mesh } from 'three';
 
-const test = new Address(0);
-const scene = new Scene();
-const canvas = document.getElementsByTagName('canvas')[0];
-const gl = canvas.getContext('webgl2');
 
-const tick = () => {
-    console.log("Tick occurred!")
-    console.log(scene);
-    console.log(test);
-    console.log(gl);
-    requestAnimationFrame(tick);
-}
-tick();
+// ------------------------------------------------
+// BASIC SETUP
+// ------------------------------------------------
 
+// Create an empty scene
+var scene = new Scene();
+
+// Create a basic perspective camera
+var camera = new PerspectiveCamera( 75, window.innerWidth/window.innerHeight, 0.1, 1000 );
+camera.position.z = 4;
+
+// Create a renderer with Antialiasing
+var renderer = new WebGLRenderer({antialias:true});
+
+// Configure renderer clear color
+renderer.setClearColor("#000000");
+
+// Configure renderer size
+renderer.setSize( window.innerWidth, window.innerHeight );
+
+// Append Renderer to DOM
+document.body.appendChild( renderer.domElement );
+
+// ------------------------------------------------
+// FUN STARTS HERE
+// ------------------------------------------------
+
+// Create a Cube Mesh with basic material
+var geometry = new BoxGeometry( 1, 1, 1 );
+var material = new MeshBasicMaterial( { color: "#FF88FF" } );
+var cube = new Mesh( geometry, material );
+
+// Add cube to Scene
+scene.add( cube );
+
+// Render Loop
+var render = function () {
+  requestAnimationFrame( render );
+
+  cube.rotation.x += 0.01;
+  cube.rotation.y += 0.01;
+
+  // Render the scene
+  renderer.render(scene, camera);
+};
+
+render();
 

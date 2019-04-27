@@ -1,1 +1,5 @@
 *.js
+*.map
+*.mjs
+dist/
+node_modules/

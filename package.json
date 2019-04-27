@@ -1,0 +1,22 @@
+{
+  "name": "net-sim",
+  "version": "1.0.0",
+  "description": "./build.sh",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ryanisaacg/net-sim.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/ryanisaacg/net-sim/issues"
+  },
+  "homepage": "https://github.com/ryanisaacg/net-sim#readme",
+  "dependencies": {
+    "three": "^0.104.0"
+  }
+}
