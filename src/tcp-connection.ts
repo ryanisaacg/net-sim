@@ -18,6 +18,8 @@ class TcpConnection {
         this.sent_data = 0;
         this.send_buffer = '';
         this.receive_buffer = '';
+
+        start.transportLayer.add(this)
     }
 
     write(data: string) {
@@ -43,19 +45,29 @@ class TcpConnection {
                 this.sent_data = ack_no;
                 if(this.sent_data != this.send_buffer.length) {
                     this.sendNext();
+                } else {
+                    this.close();
                 }
             }
         } else if(packetType == 'D') {
-            const [ seq_no, data ] = payload.split(' ')
+            const [ seq_no, data ] = payload.split('|')
             if(+seq_no == this.receive_buffer.length) {
                 this.receive_buffer += data;
+                console.log('Sent ack: ' + this.receive_buffer.length)
                 this.sendPacket('A' + this.receive_buffer.length);
             }
         } else if(packetType == 'F') {
             if(this.conn_status == Status.Closing) {
                 this.conn_status = Status.Closed;
-            } else if(this.conn_status == Status.Open){
+                console.log(this)
+                console.log('Sent close 1')
+                this.pipe.start.transportLayer.delete(this)
+            } else if(this.conn_status == Status.Open) {
                 this.conn_status = Status.Closed;
+                this.pipe.start.transportLayer.delete(this)
+                console.log(this)
+                console.log('Sent close 2')
+                console.log(packet)
                 this.sendPacket('F')
             }
         }
@@ -69,13 +81,9 @@ class TcpConnection {
     }
 
     sendNext() {
-        if(this.sent_data == this.send_buffer.length) {
-            const chunk = this.send_buffer.substring(this.sent_data, this.sent_data + 8);
-            this.sendPacket('D' + this.sent_data + ' ' + chunk);
-            this.timeout = 500;
-        } else {
-            this.close();
-        }
+        const chunk = this.send_buffer.substring(this.sent_data, this.sent_data + 8);
+        this.sendPacket('D' + this.sent_data + '|' + chunk);
+        this.timeout = 500;
     }
 
     sendPacket(payload: string) {
