@@ -1,6 +1,7 @@
 import Address from './address'
 import NetworkPacket from './network-packet'
 import Pipe from './pipe'
+import Point from './point'
 
 class NetworkNode {
     parent?: Pipe;
