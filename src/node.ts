@@ -10,6 +10,8 @@ class NetworkNode {
     queueSize: number = 4;
     queueTime: number = 2;
 
+    networkCallback: (packet: NetworkPacket) => void = () => {};
+
     // TODO: some constructor for getting an address from the parent
 
     constructor(addr: Address, pos: Point, parent?: NetworkNode) {
@@ -33,7 +35,10 @@ class NetworkNode {
     enqueuePacket(packet: NetworkPacket) {
         if(this.queue.length < this.queueSize) {
             packet.progress = 0;
-            this.queue.push(packet);
+            packet.ttl--;
+            if(packet.ttl > 0) {
+                this.queue.push(packet);
+            }
         }
     }
 
@@ -50,9 +55,20 @@ class NetworkNode {
 
     forwardPacket(packet: NetworkPacket) {
         if(packet.dest.isChild(this.addr)) {
-            // TODO: send to child
+            if(packet.dest.equals(this.addr)) {
+                this.networkCallback(packet);
+            } else {
+                this.children
+                    .filter(child => packet.dest.isChild(child.end.addr))
+                    .forEach(child => child.writePacket(packet))
+            }
         } else {
-            // TODO: send to parent or peers
+            const relevantPeers = this.peers.filter(peer => packet.dest.isChild(peer.end.addr))
+            if(relevantPeers.length > 0) {
+                relevantPeers.forEach(peer => peer.writePacket(packet))
+            } else if(this.parent) {
+                this.parent.writePacket(packet)
+            }
         }
     }
 }

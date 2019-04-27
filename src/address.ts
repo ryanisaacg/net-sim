@@ -22,4 +22,11 @@ class Address {
             (!this.institution || this.institution == other.institution) &&
             (!this.node || this.node == other.node)
     }
+
+    equals(other: Address) {
+        return this.region == other.region &&
+            this.local == other.local &&
+            this.institution == other.institution &&
+            this.node == other.node
+    }
 }
