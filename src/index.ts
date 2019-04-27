@@ -1,34 +1,9 @@
-import { Scene, PerspectiveCamera, WebGLRenderer, BoxGeometry, MeshBasicMaterial, Mesh } from 'three';
 import NetworkNode from './network-node';
 import Address from './address';
+import Renderer from './renderer';
 import Point from './point';
 
-// ------------------------------------------------
-// BASIC SETUP
-// ------------------------------------------------
-
-// Create an empty scene
-var scene = new Scene();
-
-// Create a basic perspective camera
-var camera = new PerspectiveCamera( 75, window.innerWidth/window.innerHeight, 0.1, 1000 );
-camera.position.z = 4;
-
-// Create a renderer with Antialiasing
-var renderer = new WebGLRenderer({antialias:true});
-
-// Configure renderer clear color
-renderer.setClearColor("#000000");
-
-// Configure renderer size
-renderer.setSize( window.innerWidth, window.innerHeight );
-
-// Append Renderer to DOM
-document.body.appendChild( renderer.domElement );
-
-// ------------------------------------------------
-// FUN STARTS HERE
-// ------------------------------------------------
+const renderer = new Renderer();
 
 // Whiteboard network
 let network: NetworkNode[] = [];
@@ -66,23 +41,11 @@ network.push(new NetworkNode(new Point(250, -100), c1));
 network.push(new NetworkNode(new Point(200, -150), c1));
 network.push(new NetworkNode(new Point(150, -200), c2));
 
-// Create a Cube Mesh with basic material
-var geometry = new BoxGeometry( 1, 1, 1 );
-var material = new MeshBasicMaterial( { color: "#000000" } );
-var cube = new Mesh( geometry, material );
+renderer.updateSimulation(region);
 
-// Add cube to Scene
-scene.add( cube );
-
-// Render Loop
-var render = function () {
-  requestAnimationFrame( render );
-
-  cube.rotation.x += 0.01;
-  cube.rotation.y += 0.01;
-
-  // Render the scene
-  renderer.render(scene, camera);
+const render = function () {
+    requestAnimationFrame( render );
+    renderer.render();
 };
 
 render();

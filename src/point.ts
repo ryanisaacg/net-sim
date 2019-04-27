@@ -13,3 +13,5 @@ class Point {
         return Math.sqrt(x * x + y * y);
     }
 }
+
+export default Point
