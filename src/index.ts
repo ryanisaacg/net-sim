@@ -1,50 +1,21 @@
-import { Scene, PerspectiveCamera, WebGLRenderer, BoxGeometry, MeshBasicMaterial, Mesh } from 'three';
+import Address from './address'
+import NetworkNode from './network-node'
+import Point from './point'
+import Renderer from './renderer';
 
+const renderer = new Renderer();
 
-// ------------------------------------------------
-// BASIC SETUP
-// ------------------------------------------------
+const rootNode = new NetworkNode(new Address(0), new Point(0, 0));
+new NetworkNode(new Address(0, 1), new Point(5, 0), rootNode);
+new NetworkNode(new Address(0, 2), new Point(0, 5), rootNode);
+new NetworkNode(new Address(0, 3), new Point(0, -5), rootNode);
+new NetworkNode(new Address(0, 4), new Point(-5, 0), rootNode);
 
-// Create an empty scene
-var scene = new Scene();
+renderer.updateSimulation(rootNode);
 
-// Create a basic perspective camera
-var camera = new PerspectiveCamera( 75, window.innerWidth/window.innerHeight, 0.1, 1000 );
-camera.position.z = 4;
-
-// Create a renderer with Antialiasing
-var renderer = new WebGLRenderer({antialias:true});
-
-// Configure renderer clear color
-renderer.setClearColor("#000000");
-
-// Configure renderer size
-renderer.setSize( window.innerWidth, window.innerHeight );
-
-// Append Renderer to DOM
-document.body.appendChild( renderer.domElement );
-
-// ------------------------------------------------
-// FUN STARTS HERE
-// ------------------------------------------------
-
-// Create a Cube Mesh with basic material
-var geometry = new BoxGeometry( 1, 1, 1 );
-var material = new MeshBasicMaterial( { color: "#FF88FF" } );
-var cube = new Mesh( geometry, material );
-
-// Add cube to Scene
-scene.add( cube );
-
-// Render Loop
-var render = function () {
-  requestAnimationFrame( render );
-
-  cube.rotation.x += 0.01;
-  cube.rotation.y += 0.01;
-
-  // Render the scene
-  renderer.render(scene, camera);
+const render = function () {
+    requestAnimationFrame( render );
+    renderer.render();
 };
 
 render();
