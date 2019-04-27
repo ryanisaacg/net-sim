@@ -71,7 +71,7 @@ function update () {
     renderer.updateSimulation(region);
     let hosts = network.filter((node) => node.addr.node);
     hosts.forEach((host) => {
-        if(Math.random() < 0.00001) {
+        if(Math.random() < 0.001) {
             let target = hosts[Math.floor(Math.random() * hosts.length)];
             host.enqueuePacket(new NetworkPacket(host.addr, target.addr, "Henwo"));
             host.enqueuePacket(new NetworkPacket(host.addr, target.addr, "Wowwd"));

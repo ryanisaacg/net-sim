@@ -13,9 +13,9 @@ class NetworkNode {
 
     queue: NetworkPacket[] = [];
     queueSize: number = 4;
-    queueTime: number = 2;
+    queueTime: number = 10;
 
-    networkCallback: (packet: NetworkPacket) => void = () => {};
+    networkCallback: (packet: NetworkPacket) => void = (packet) => { console.log("Packet received: " + packet) };
 
     // TODO: some constructor for getting an address from the parent
 
