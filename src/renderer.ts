@@ -8,9 +8,12 @@ import Pipe from './pipe'
 import Point from './point'
 
 const NODE_MATERIAL = new MeshBasicMaterial( { color: "#FFFFFF" } );
+const HOST_MATERIAL = new MeshBasicMaterial( { color: "#666666" } );
 
 let PACKET = new Mesh(new BoxGeometry(4, 4, 4), NODE_MATERIAL)
 let ROUTER = new Mesh(new BoxGeometry( 1, 1, 1 ), NODE_MATERIAL);
+let HOST = new Mesh(new BoxGeometry( 1, 1, 1 ), HOST_MATERIAL);
+
 
 const loader = new OBJLoader();
 loader.load(
@@ -20,6 +23,13 @@ loader.load(
         ROUTER.material = NODE_MATERIAL;
     }
 );
+loader.load(
+    'models/host.obj',
+    (model) => {
+        HOST = <Mesh>model.children[0];
+        HOST.material = HOST_MATERIAL;
+    }
+)
 
 const PIPE_MATERIAL = new LineBasicMaterial({ color: "#00FFFF" })
 
@@ -60,7 +70,8 @@ class Renderer {
 
     addNode(root: NetworkNode) {
         // Create a Cube Mesh with basic material
-        const cube = new Mesh(ROUTER.geometry, ROUTER.material);
+        const model = root.children.length > 0 ? ROUTER : HOST;
+        const cube = new Mesh(model.geometry, model.material);
         translateMesh(cube, pointToVec(root.pos));
 
         // Add cube to Scene
