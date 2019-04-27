@@ -10,7 +10,7 @@ let network: NetworkNode[] = [];
 let region = new NetworkNode(new Point(0, 0), new Address(1));
 let localA = new NetworkNode(new Point(0, 100), region);
 let localB = new NetworkNode(new Point(-50, -100), region);
-let localC = new NetworkNode(new Point(50, 100), region);
+let localC = new NetworkNode(new Point(50, -100), region);
 localA.addPeer(localB);
 localA.addPeer(localC);
 localB.addPeer(localC);
