@@ -68,7 +68,6 @@ const updateNode = function (node: NetworkNode) {
 setInterval(update, 100);
 function update () {
     updateNode(region);
-<<<<<<< HEAD
     renderer.updateSimulation(region);
     let hosts = network.filter((node) => node.addr.node);
     hosts.forEach((host) => {
