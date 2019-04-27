@@ -50,6 +50,7 @@ renderer.updateSimulation(region);
 
 const render = function () {
     requestAnimationFrame( render );
+    renderer.updateSimulation(region);
     renderer.render();
 };
 
