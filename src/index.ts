@@ -43,8 +43,6 @@ network.push(c11);
 network.push(new NetworkNode(new Point(250, -100), c1));
 network.push(new NetworkNode(new Point(200, -150), c1));
 network.push(new NetworkNode(new Point(150, -200), c2));
-let p = new NetworkPacket(a11.addr, c11.addr, "henlo");
-a11.enqueuePacket(p);
 
 renderer.updateSimulation(region);
 
@@ -71,4 +69,12 @@ setInterval(update, 100);
 function update () {
     updateNode(region);
     renderer.updateSimulation(region);
+    let hosts = network.filter((node) => node.addr.node);
+    hosts.forEach((host) => {
+        if(Math.random() < 0.001) {
+            let target = hosts[Math.floor(Math.random() * hosts.length)];
+            host.enqueuePacket(new NetworkPacket(host.addr, target.addr, "Henwo"));
+            host.enqueuePacket(new NetworkPacket(host.addr, target.addr, "Wowwd"));
+        }
+    });
 }

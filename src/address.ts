@@ -18,9 +18,9 @@ class Address {
 
     isChildOf(other: Address) {
         return this.region == other.region &&
-            (!this.local || this.local == other.local) &&
-            (!this.institution || this.institution == other.institution) &&
-            (!this.node || this.node == other.node)
+            (!other.local || this.local == other.local) &&
+            (!other.institution || this.institution == other.institution) &&
+            (!other.node || this.node == other.node)
     }
 
     equals(other: Address) {
