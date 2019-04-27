@@ -58,7 +58,7 @@ class Renderer {
         // Create a Cube Mesh with basic material
         const cube = ROUTER.clone();
         cube.translateX(root.pos.x);
-        cube.translateZ(root.pos.y);
+        cube.translateZ(-root.pos.y);
 
         // Add cube to Scene
         this.scene.add(cube);
@@ -71,8 +71,8 @@ class Renderer {
         const end = pipe.end.pos;
 
         const points = new Geometry();
-        points.vertices.push(new Vector3(start.x, 0, start.y));
-        points.vertices.push(new Vector3(end.x, 0, end.y));
+        points.vertices.push(new Vector3(start.x, 0, -start.y));
+        points.vertices.push(new Vector3(end.x, 0, -end.y));
         this.scene.add(new Line(points, PIPE_MATERIAL));
 
         this.addNode(pipe.end)
