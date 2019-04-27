@@ -33,7 +33,7 @@ class Renderer {
         // Create a basic perspective camera
         this.camera = new PerspectiveCamera( 75, window.innerWidth/window.innerHeight, 1, 10000 );
         this.controls = new OrbitControls(this.camera);
-        this.camera.position.set(0, 20, 0);
+        this.camera.position.set(0, 500, 0);
         this.controls.update();
 
         this.gfx = new WebGLRenderer({antialias:true});
