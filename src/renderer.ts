@@ -3,10 +3,13 @@ import { BoxGeometry, Geometry, Line, LineBasicMaterial, Mesh, MeshBasicMaterial
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
 import { OBJLoader } from 'three/examples/jsm/loaders/OBJLoader';
 import NetworkNode from './network-node'
+import NetworkPacket from './network-packet'
 import Pipe from './pipe'
+import Point from './point'
 
 const NODE_MATERIAL = new MeshBasicMaterial( { color: "#FFFFFF" } );
 
+let PACKET = new Mesh(new BoxGeometry(4, 4, 4), NODE_MATERIAL)
 let ROUTER = new Mesh(new BoxGeometry( 1, 1, 1 ), NODE_MATERIAL);
 
 const loader = new OBJLoader();
@@ -50,8 +53,7 @@ class Renderer {
 
     updateSimulation(root: NetworkNode) {
         this.scene.children.forEach(mesh => {
-            mesh.dispose();
-            scene.remove(mesh);
+            this.scene.remove(mesh);
         })
         this.addNode(root)
     }
@@ -59,12 +61,14 @@ class Renderer {
     addNode(root: NetworkNode) {
         // Create a Cube Mesh with basic material
         const cube = new Mesh(ROUTER.geometry, ROUTER.material);
-        cube.translateX(root.pos.x);
-        cube.translateZ(-root.pos.y);
+        translateMesh(cube, pointToVec(root.pos));
 
         // Add cube to Scene
         this.scene.add(cube);
 
+        if(root.parent) {
+            this.addPipe(root.parent)
+        }
         root.children.forEach((pipe) => {
             this.addPipe(pipe);
             this.addNode(pipe.end);
@@ -75,14 +79,35 @@ class Renderer {
     }
 
     addPipe(pipe: Pipe) {
-        const start = pipe.start.pos;
-        const end = pipe.end.pos;
-
         const points = new Geometry();
-        points.vertices.push(new Vector3(start.x, 0, -start.y));
-        points.vertices.push(new Vector3(end.x, 0, -end.y));
+        points.vertices.push(pointToVec(pipe.start.pos));
+        points.vertices.push(pointToVec(pipe.end.pos));
         this.scene.add(new Line(points, PIPE_MATERIAL));
+
+        pipe.networkPackets.forEach(packet => this.addPacket(packet, pipe));
     }
+
+    addPacket(packet: NetworkPacket, pipe: Pipe) {
+        const start = pointToVec(pipe.start.pos);
+        const end = pointToVec(pipe.end.pos);
+        const position = start.lerp(end, packet.progress / pipe.length);
+        console.log(position);
+
+        const packetMesh = new Mesh(PACKET.geometry, PACKET.material);
+        translateMesh(packetMesh, position);
+
+        this.scene.add(packetMesh);
+    }
+}
+
+function translateMesh(mesh: Mesh, vec: Vector3) {
+    mesh.translateX(vec.x);
+    mesh.translateY(vec.y);
+    mesh.translateZ(vec.z);
+}
+
+function pointToVec(point: Point) {
+    return new Vector3(point.x, 0, -point.y);
 }
 
 export default Renderer

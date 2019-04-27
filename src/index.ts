@@ -50,7 +50,6 @@ renderer.updateSimulation(region);
 
 const render = function () {
     requestAnimationFrame( render );
-    renderer.updateSimulation(region);
     renderer.render();
 };
 
@@ -71,5 +70,5 @@ const updateNode = function (node: NetworkNode) {
 setInterval(update, 100);
 function update () {
     updateNode(region);
-    console.log(p.progress);
+    renderer.updateSimulation(region);
 }
