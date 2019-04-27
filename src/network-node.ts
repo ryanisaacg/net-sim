@@ -79,13 +79,41 @@ class NetworkNode {
                     .forEach(child => child.writePacket(packet))
             }
         } else {
-            const relevantPeers = this.peers.filter(peer => packet.dest.isChildOf(peer.end.addr))
+            const relevantPeers = this.peers.filter(peer => packet.dest.isChildOf(peer.end.addr));
             if(relevantPeers.length > 0) {
-                relevantPeers.forEach(peer => peer.writePacket(packet))
+                relevantPeers.forEach(peer => peer.writePacket(packet));
             } else if(this.parent) {
-                this.parent.writePacket(packet)
+                this.parent.writePacket(packet);
             }
         }
+    }
+
+    distanceTo(dest: NetworkNode) {
+        let dist = 0.0;
+        let current: NetworkNode = this;
+
+        while(!dest.addr.equals(current.addr)) {
+            let targetPipe = null;
+
+            if(dest.addr.isChildOf(current.addr)) {
+                targetPipe = current.children.filter(child => dest.addr.isChildOf(child.end.addr))[0];
+            } else {
+                const relevantPeers = current.peers.filter(peer => dest.addr.isChildOf(peer.end.addr));
+                if(relevantPeers.length > 0) {
+                    targetPipe = relevantPeers[0];
+                } else if(current.parent) {
+                    targetPipe = current.parent;
+                } else {
+                    dist = -1;
+                    break;
+                }
+            }
+
+            dist += targetPipe.length;
+            current = targetPipe.end;
+        }
+
+        return dist;
     }
 }
 
