@@ -1,4 +1,5 @@
 import NetworkNode from './network-node';
+import NetworkPacket from './network-packet';
 import Address from './address';
 import Renderer from './renderer';
 import Point from './point';
@@ -25,7 +26,8 @@ let c1 = new NetworkNode(new Point(150, -100), localC);
 let c2 = new NetworkNode(new Point(100, -150), localC);
 c1.addPeer(c2);
 Array.prototype.push.apply(network, [region, localA, localB, localC, a1, a2, a3, b1, b2, c1, c2]); // Add nodes made so far to the network
-network.push(new NetworkNode(new Point(-150, 200), a1));
+let a11 = new NetworkNode(new Point(-150, 200), a1);
+network.push(a11);
 network.push(new NetworkNode(new Point(-100, 250), a1));
 network.push(new NetworkNode(new Point(-50, 300), a2));
 network.push(new NetworkNode(new Point(50, 300), a2));
@@ -36,10 +38,13 @@ network.push(new NetworkNode(new Point(-250, -120), b1));
 network.push(new NetworkNode(new Point(-200, -150), b1));
 network.push(new NetworkNode(new Point(-150, -200), b2));
 network.push(new NetworkNode(new Point(-50, -200), b2));
-network.push(new NetworkNode(new Point(200, -50), c1));
+let c11 = new NetworkNode(new Point(200, -50), c1);
+network.push(c11);
 network.push(new NetworkNode(new Point(250, -100), c1));
 network.push(new NetworkNode(new Point(200, -150), c1));
 network.push(new NetworkNode(new Point(150, -200), c2));
+let p = new NetworkPacket(a11.addr, c11.addr, "henlo");
+a11.enqueuePacket(p);
 
 renderer.updateSimulation(region);
 
@@ -49,3 +54,21 @@ const render = function () {
 };
 
 render();
+
+const updateNode = function (node: NetworkNode) {
+    node.tick();
+    if(node.parent) {
+        node.parent.tick();
+    }
+    node.peers.forEach(peer => peer.tick());
+    node.children.forEach(child => {
+        child.tick();
+        updateNode(child.end);
+    })
+};
+
+setInterval(update, 100);
+function update () {
+    updateNode(region);
+    console.log(p.progress);
+}

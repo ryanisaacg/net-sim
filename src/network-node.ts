@@ -61,7 +61,9 @@ class NetworkNode {
 
         const packet = this.queue[0];
         if(packet.progress >= this.queueTime) {
-            this.forwardPacket(packet)
+            this.forwardPacket(packet);
+            packet.progress = 0;
+            this.queue.shift();
         } else {
             packet.progress += 1;
         }

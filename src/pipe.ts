@@ -22,7 +22,10 @@ class Pipe {
         this.networkPackets.forEach(packet => packet.progress += 1);
 
         const completed = this.networkPackets.filter(packet => packet.progress >= this.length);
-        completed.forEach(this.end.enqueuePacket);
+        completed.forEach((packet) => {
+            this.end.enqueuePacket(packet);
+            this.networkPackets.splice(this.networkPackets.indexOf(packet), 1);
+        });
 
         const inProgress = this.networkPackets.filter(packet => packet.progress < this.length);
         this.networkPackets = inProgress;
