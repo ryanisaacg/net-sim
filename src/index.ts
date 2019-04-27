@@ -48,7 +48,6 @@ renderer.updateSimulation(region);
 
 const render = function () {
     requestAnimationFrame( render );
-    renderer.updateSimulation(region);
     renderer.render();
 };
 
@@ -69,6 +68,8 @@ const updateNode = function (node: NetworkNode) {
 setInterval(update, 100);
 function update () {
     updateNode(region);
+<<<<<<< HEAD
+    renderer.updateSimulation(region);
     let hosts = network.filter((node) => node.addr.node);
     hosts.forEach((host) => {
         if(Math.random() < 0.00001) {
