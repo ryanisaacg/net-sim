@@ -8,12 +8,11 @@ import Pipe from './pipe'
 import Point from './point'
 
 const NODE_MATERIAL = new MeshBasicMaterial( { color: "#FFFFFF" } );
-const HOST_MATERIAL = new MeshBasicMaterial( { color: "#666666" } );
+const HOST_MATERIAL = new MeshBasicMaterial( { color: "#00FF00" } );
 
 let PACKET = new Mesh(new BoxGeometry(4, 4, 4), NODE_MATERIAL)
 let ROUTER = new Mesh(new BoxGeometry( 1, 1, 1 ), NODE_MATERIAL);
 let HOST = new Mesh(new BoxGeometry( 1, 1, 1 ), HOST_MATERIAL);
-
 
 const loader = new OBJLoader();
 loader.load(
@@ -63,6 +62,7 @@ class Renderer {
 
     updateSimulation(root: NetworkNode) {
         this.scene.children.forEach(mesh => {
+            (<Mesh>mesh).geometry.dispose();
             this.scene.remove(mesh);
         })
         this.addNode(root)
