@@ -1,5 +1,5 @@
-import { BoxGeometry, Geometry, Line, LineBasicMaterial, Mesh, MeshBasicMaterial,
-    PerspectiveCamera, Scene, WebGLRenderer, Vector3 } from 'three';
+import { BoxGeometry, Geometry, Line, LineBasicMaterial, Material, Mesh, MeshBasicMaterial,
+    PerspectiveCamera, Raycaster, Scene, WebGLRenderer, Vector3 } from 'three';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
 import { OBJLoader } from 'three/examples/jsm/loaders/OBJLoader';
 import NetworkNode from './network-node'
@@ -16,7 +16,7 @@ const TCP_HOST_MATERIAL = new MeshBasicMaterial({ color: "#FF0000" })
 const APP_PIPE_MATERIAL = new LineBasicMaterial({ color: "#00FF00" })
 const APP_HOST_MATERIAL = new MeshBasicMaterial({ color: "#00FF00" })
 
-let PACKET = new Mesh(new BoxGeometry(4, 4, 4), PACKET_MATERIAL)
+let PACKET = new Mesh(new BoxGeometry(8, 8, 8), PACKET_MATERIAL)
 let ROUTER = new Mesh(new BoxGeometry( 1, 1, 1 ), NODE_MATERIAL);
 let HOST = new Mesh(new BoxGeometry( 1, 1, 1 ), HOST_MATERIAL);
 
@@ -36,12 +36,18 @@ loader.load(
     }
 )
 
+const mouse = {
+    x: 0,
+    y: 0,
+}
+
 
 class Renderer {
     scene: Scene;
     camera: PerspectiveCamera;
     controls: OrbitControls;
     gfx: WebGLRenderer;
+    raycaster: Raycaster;
 
     constructor() {
         // Create an empty scene
@@ -56,11 +62,29 @@ class Renderer {
         this.gfx = new WebGLRenderer({antialias:true});
         this.gfx.setClearColor("#000000");
         this.gfx.setSize( window.innerWidth, window.innerHeight );
+        this.gfx.domElement.onmousemove = (evt) => {
+            mouse.x = ( evt.clientX / window.innerWidth ) * 2 - 1;
+            mouse.y = - ( evt.clientY / window.innerHeight ) * 2 + 1;
+        }
         document.body.appendChild( this.gfx.domElement );
+
+        this.raycaster = new Raycaster();
     }
 
     render() {
         this.controls.update();
+
+        // update the picking ray with the camera and mouse position
+        this.raycaster.setFromCamera(mouse, this.camera);
+
+        // calculate objects intersecting the picking ray
+        this.raycaster.intersectObjects(this.scene.children).forEach(child => {
+            const mesh = <Mesh>child.object;
+            if(mesh.geometry.id == PACKET.geometry.id) {
+                mesh.material = HOST_MATERIAL;
+            }
+        });
+
         // Render the scene
         this.gfx.render(this.scene, this.camera);
     }
