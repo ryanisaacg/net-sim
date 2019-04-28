@@ -85,8 +85,26 @@ let hosts = network.filter((node) => node.addr.node);
     tcpConnections.push([toTarget, toHost])
 })
 
+let paused = false;
+const pauseButton = document.getElementById('pause')!;
+
+pauseButton.onclick = () => {
+    if(paused) {
+        pauseButton.innerHTML = 'Pause Simulation';
+        paused = false;
+    } else {
+        pauseButton.innerHTML = 'Play Simulation';
+        paused = true;
+    }
+}
+
 setInterval(update, 20);
 function update () {
+    if(paused) {
+        renderer.updateSimulation(region);
+        return;
+    }
+
     tcpConnections.forEach(([a, b]) => {
         a.tick();
         b.tick();

@@ -1,8 +1,9 @@
-import { BoxGeometry, Geometry, Line, LineBasicMaterial, Material, Mesh, MeshBasicMaterial,
+import { BoxGeometry, Geometry, Line, LineBasicMaterial, Mesh, MeshBasicMaterial,
     PerspectiveCamera, Raycaster, Scene, WebGLRenderer, Vector3 } from 'three';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
 import { OBJLoader } from 'three/examples/jsm/loaders/OBJLoader';
 import NetworkNode from './network-node'
+import NetworkPacket from './network-packet'
 import Pipe from './pipe'
 import Point from './point'
 import TcpConnection from './tcp-connection'
@@ -41,6 +42,21 @@ const mouse = {
     y: 0,
 }
 
+const WIDTH = window.innerWidth * 2 / 3;
+const HEIGHT = window.innerHeight;
+
+type Selection = {
+    tag: 'app';
+    tcp: TcpConnection;
+} | {
+    tag: 'tcp';
+    packet: NetworkPacket;
+    tcp: TcpConnection;
+} | {
+    tag: 'net';
+    packet: NetworkPacket;
+    pipe: Pipe;
+};
 
 class Renderer {
     scene: Scene;
@@ -48,25 +64,28 @@ class Renderer {
     controls: OrbitControls;
     gfx: WebGLRenderer;
     raycaster: Raycaster;
+    selected?: Selection;
 
     constructor() {
         // Create an empty scene
         this.scene = new Scene();
 
         // Create a basic perspective camera
-        this.camera = new PerspectiveCamera( 75, window.innerWidth/window.innerHeight, 1, 10000 );
+        this.camera = new PerspectiveCamera( 75, WIDTH / HEIGHT, 1, 10000 );
         this.controls = new OrbitControls(this.camera);
         this.camera.position.set(0, 500, 0);
         this.controls.update();
 
         this.gfx = new WebGLRenderer({antialias:true});
         this.gfx.setClearColor("#000000");
-        this.gfx.setSize( window.innerWidth, window.innerHeight );
+        this.gfx.setSize(WIDTH, HEIGHT);
         this.gfx.domElement.onmousemove = (evt) => {
-            mouse.x = ( evt.clientX / window.innerWidth ) * 2 - 1;
-            mouse.y = - ( evt.clientY / window.innerHeight ) * 2 + 1;
+            mouse.x = ( evt.clientX / WIDTH ) * 2 - 1;
+            mouse.y = - ( evt.clientY / HEIGHT ) * 2 + 1;
         }
-        document.body.appendChild( this.gfx.domElement );
+
+        const container = document.getElementById('container')!;
+        container.appendChild( this.gfx.domElement );
 
         this.raycaster = new Raycaster();
     }
@@ -82,6 +101,23 @@ class Renderer {
             const mesh = <Mesh>child.object;
             if(mesh.geometry.id == PACKET.geometry.id) {
                 mesh.material = HOST_MATERIAL;
+                this.selected = <Selection>child.object.userData;
+                const overlay = document.getElementById('overlay')!;//.innerHTML = child.object.userData.tag;
+
+                if(this.selected.tag == 'app') {
+                    overlay.innerHTML = `
+                    <tr>
+                        <th> Message </th>
+                    </tr>
+                    <tr>
+                        <td> ${this.selected.tcp.send_buffer} </td>
+                    </tr>
+                    `
+                } else if(this.selected.tag == 'tcp') {
+
+                } else if(this.selected.tag == 'net') {
+
+                }
             }
         });
 
@@ -115,7 +151,7 @@ class Renderer {
 
     addPipe(pipe: Pipe) {
         this.addLine(pipe, PIPE_MATERIAL);
-        pipe.networkPackets.forEach(packet => this.addPacket(packet.progress, pipe));
+        pipe.networkPackets.forEach(packet => this.addPacket(packet.progress, pipe, { tag: 'net', packet, pipe }));
     }
 
     addTcpPipe(tcp: TcpConnection) {
@@ -125,7 +161,7 @@ class Renderer {
         this.addMesh(HOST, tcp.pipe.start.pos, TCP_HOST_MATERIAL, TCP_Z);
         this.addMesh(HOST, tcp.pipe.end.pos, TCP_HOST_MATERIAL, TCP_Z);
 
-        tcp.pipe.networkPackets.forEach(packet => this.addPacket(packet.distanceTraveled, tcp.pipe, TCP_Z));
+        tcp.pipe.networkPackets.forEach(packet => this.addPacket(packet.distanceTraveled, tcp.pipe, { tag: 'tcp', tcp, packet }, TCP_Z));
 
         const APP_Z = 100;
 
@@ -134,16 +170,36 @@ class Renderer {
         this.addMesh(HOST, tcp.pipe.end.pos, APP_HOST_MATERIAL, APP_Z);
 
         if(tcp.send_buffer.length > 0) {
-            this.addPacket(tcp.sent_data / tcp.send_buffer.length * tcp.pipe.length, tcp.pipe, APP_Z);
+            this.addPacket(tcp.sent_data / tcp.send_buffer.length * tcp.pipe.length, tcp.pipe, { tag: 'app', tcp }, APP_Z);
         }
     }
 
-    addPacket(progress: number, pipe: Pipe, z?: number) {
+    addPacket(progress: number, pipe: Pipe, data: Selection, z?: number) {
         const start = pointToVec(pipe.start.pos, z);
         const end = pointToVec(pipe.end.pos, z);
         const position = start.lerp(end, progress / pipe.length);
 
+        /*
+         TODO: check if it's selected
+         let mesh;
+
+        if(this.selection) {
+            if(this.selection.tag == 'app') {
+
+            } else if(this.selection.tag == 'tcp') {
+
+            } else if(this.selection.tag == 'net') {
+                mesh = ()
+            }
+        }
+        if(!this.selection) {
+            mesh = PACKET;
+        } else if(this.selection.tag == 'app') {
+
+        } else if(this.selec)*/
+
         const packetMesh = new Mesh(PACKET.geometry, PACKET.material);
+        packetMesh.userData = data;
         translateMesh(packetMesh, position);
 
         this.scene.add(packetMesh);
