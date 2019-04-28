@@ -72,8 +72,8 @@ const updateNode = function (node: NetworkNode) {
 
 let hosts = network.filter((node) => node.addr.node);
 [
-    [0, 7],
-    [1, 4],
+    // [0, 7],
+    // [1, 4],
     [3, 12],
     [3, 5],
 ].forEach(([hostIndex, targetIndex]) => {
@@ -81,7 +81,7 @@ let hosts = network.filter((node) => node.addr.node);
     let target = hosts[targetIndex]
     const toTarget = new TcpConnection(host, target);
     const toHost = new TcpConnection(target, host);
-    toTarget.write("Yo can I get uhhh BONELESS PIZZA.");
+    toTarget.write("Hello.");
     tcpConnections.push([toTarget, toHost])
 })
 
@@ -103,6 +103,10 @@ function update () {
             let target = hosts[Math.floor(Math.random() * hosts.length)];
             host.enqueuePacket(new NetworkPacket(host.addr, target.addr, "!Henwo"));
             host.enqueuePacket(new NetworkPacket(host.addr, target.addr, "!Wowwd"));
+        }
+
+        if(Math.random() < 0.0001) {
+
         }
     });
 }

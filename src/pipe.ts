@@ -20,8 +20,8 @@ class Pipe {
 
     tick() {
         this.networkPackets.forEach(packet => {
-            packet.progress += 2;
-            packet.distanceTraveled += 2;
+            packet.progress += 5;
+            packet.distanceTraveled += 5;
         });
 
         const completed = this.networkPackets.filter(packet => packet.progress >= this.length);

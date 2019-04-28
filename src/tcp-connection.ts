@@ -46,7 +46,7 @@ class TcpConnection {
                 if(this.sent_data != this.send_buffer.length) {
                     this.sendNext();
                 } else {
-                    this.close();
+                    // this.close();
                 }
             }
         } else if(packetType == 'D') {
@@ -55,6 +55,8 @@ class TcpConnection {
                 this.receive_buffer += data;
                 console.log('Sent ack: ' + this.receive_buffer.length)
                 this.sendPacket('A' + this.receive_buffer.length);
+
+                this.converse();
             }
         } else if(packetType == 'F') {
             if(this.conn_status == Status.Closing || this.conn_status == Status.Closed) {
@@ -80,8 +82,6 @@ class TcpConnection {
             this.sendNext();
         }
         this.pipe.networkPackets = this.pipe.networkPackets.filter(packet => packet.distanceTraveled < this.pipe.length);
-
-        this.converse();
     }
 
     sendNext() {
@@ -113,22 +113,23 @@ class TcpConnection {
             "I don't know actually.": [0.7, "Well, talk to you later?", 0.3, "Ok, talk to you later."],
             "Nothing.": [0.6, "Well, talk to you later?", 0.4, "Ok, talk to you later."],
             "Well, talk to you later?": [0.6, "Sure.", 0.4, "Ok, talk to you later."],
-            "Don't wanna talk.": [],
-            "Ok, talk to you later.": [],
-            "Sure.": []
+            "Don't wanna talk.": [-1],
+            "Ok, talk to you later.": [-1],
+            "Sure.": [-1]
         };
 
         for(var phrase in markovChain) {
             if(this.receive_buffer.endsWith(phrase)) {
-                if(markovChain[phrase] == []) {
+                if(markovChain[phrase][0] == -1) {
                     // Ready to close
+                    this.close();
                 } else {
                     let choice = Math.random();
                     while((choice -= markovChain[phrase].shift()) >= 0) {
                         markovChain[phrase].shift();
                     }
 
-                    this.send_buffer += markovChain[phrase][0];
+                    this.write(markovChain[phrase][0]);
                 }
 
                 break;
