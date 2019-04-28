@@ -2,6 +2,7 @@ import Address from './address'
 import NetworkPacket from './network-packet'
 import Pipe from './pipe'
 import Point from './point'
+import TcpConnection from './tcp-connection'
 
 class NetworkNode {
     parent?: Pipe;
@@ -15,7 +16,7 @@ class NetworkNode {
     queueSize: number = 4;
     queueTime: number = 10;
 
-    networkCallback: (packet: NetworkPacket) => void = (packet) => { console.log("Packet received: " + packet) };
+    transportLayer: Set<TcpConnection>;
 
     // TODO: some constructor for getting an address from the parent
 
@@ -36,6 +37,8 @@ class NetworkNode {
         } else {
             this.addr = origin;
         }
+
+        this.transportLayer = new Set();
     }
 
     // Buggy, only initial parent
@@ -72,7 +75,7 @@ class NetworkNode {
     forwardPacket(packet: NetworkPacket) {
         if(packet.dest.isChildOf(this.addr)) {
             if(packet.dest.equals(this.addr)) {
-                this.networkCallback(packet);
+                this.transportLayer.forEach(transport => transport.packetReceived(packet));
             } else {
                 this.children
                     .filter(child => packet.dest.isChildOf(child.end.addr))

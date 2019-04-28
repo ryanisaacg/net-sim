@@ -3,14 +3,20 @@ import { BoxGeometry, Geometry, Line, LineBasicMaterial, Mesh, MeshBasicMaterial
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
 import { OBJLoader } from 'three/examples/jsm/loaders/OBJLoader';
 import NetworkNode from './network-node'
-import NetworkPacket from './network-packet'
 import Pipe from './pipe'
 import Point from './point'
+import TcpConnection from './tcp-connection'
 
-const NODE_MATERIAL = new MeshBasicMaterial( { color: "#FFFFFF" } );
-const HOST_MATERIAL = new MeshBasicMaterial( { color: "#00FF00" } );
+const PACKET_MATERIAL = new MeshBasicMaterial( { color: "#FFFFFF" } );
+const NODE_MATERIAL = new MeshBasicMaterial( { color: "#0088AA" } );
+const HOST_MATERIAL = new MeshBasicMaterial( { color: "#00FFFF" } );
+const PIPE_MATERIAL = new LineBasicMaterial({ color: "#00FFFF" })
+const TCP_PIPE_MATERIAL = new LineBasicMaterial({ color: "#FF0000" })
+const TCP_HOST_MATERIAL = new MeshBasicMaterial({ color: "#FF0000" })
+const APP_PIPE_MATERIAL = new LineBasicMaterial({ color: "#00FF00" })
+const APP_HOST_MATERIAL = new MeshBasicMaterial({ color: "#00FF00" })
 
-let PACKET = new Mesh(new BoxGeometry(4, 4, 4), NODE_MATERIAL)
+let PACKET = new Mesh(new BoxGeometry(4, 4, 4), PACKET_MATERIAL)
 let ROUTER = new Mesh(new BoxGeometry( 1, 1, 1 ), NODE_MATERIAL);
 let HOST = new Mesh(new BoxGeometry( 1, 1, 1 ), HOST_MATERIAL);
 
@@ -30,7 +36,6 @@ loader.load(
     }
 )
 
-const PIPE_MATERIAL = new LineBasicMaterial({ color: "#00FFFF" })
 
 class Renderer {
     scene: Scene;
@@ -70,12 +75,7 @@ class Renderer {
 
     addNode(root: NetworkNode) {
         // Create a Cube Mesh with basic material
-        const model = root.children.length > 0 ? ROUTER : HOST;
-        const cube = new Mesh(model.geometry, model.material);
-        translateMesh(cube, pointToVec(root.pos));
-
-        // Add cube to Scene
-        this.scene.add(cube);
+        this.addMesh(root.children.length > 0 ? ROUTER : HOST, root.pos);
 
         if(root.parent) {
             this.addPipe(root.parent)
@@ -90,24 +90,52 @@ class Renderer {
     }
 
     addPipe(pipe: Pipe) {
-        const points = new Geometry();
-        points.vertices.push(pointToVec(pipe.start.pos));
-        points.vertices.push(pointToVec(pipe.end.pos));
-        this.scene.add(new Line(points, PIPE_MATERIAL));
-
-        pipe.networkPackets.forEach(packet => this.addPacket(packet, pipe));
+        this.addLine(pipe, PIPE_MATERIAL);
+        pipe.networkPackets.forEach(packet => this.addPacket(packet.progress, pipe));
     }
 
-    addPacket(packet: NetworkPacket, pipe: Pipe) {
-        const start = pointToVec(pipe.start.pos);
-        const end = pointToVec(pipe.end.pos);
-        const position = start.lerp(end, packet.progress / pipe.length);
-        console.log(position);
+    addTcpPipe(tcp: TcpConnection) {
+        const TCP_Z = 50;
+
+        this.addLine(tcp.pipe, TCP_PIPE_MATERIAL, TCP_Z);
+        this.addMesh(HOST, tcp.pipe.start.pos, TCP_HOST_MATERIAL, TCP_Z);
+        this.addMesh(HOST, tcp.pipe.end.pos, TCP_HOST_MATERIAL, TCP_Z);
+
+        tcp.pipe.networkPackets.forEach(packet => this.addPacket(packet.distanceTraveled, tcp.pipe, TCP_Z));
+
+        const APP_Z = 100;
+
+        this.addLine(tcp.pipe, APP_PIPE_MATERIAL, APP_Z);
+        this.addMesh(HOST, tcp.pipe.start.pos, APP_HOST_MATERIAL, APP_Z);
+        this.addMesh(HOST, tcp.pipe.end.pos, APP_HOST_MATERIAL, APP_Z);
+
+        if(tcp.send_buffer.length > 0) {
+            this.addPacket(tcp.sent_data / tcp.send_buffer.length * tcp.pipe.length, tcp.pipe, APP_Z);
+        }
+    }
+
+    addPacket(progress: number, pipe: Pipe, z?: number) {
+        const start = pointToVec(pipe.start.pos, z);
+        const end = pointToVec(pipe.end.pos, z);
+        const position = start.lerp(end, progress / pipe.length);
 
         const packetMesh = new Mesh(PACKET.geometry, PACKET.material);
         translateMesh(packetMesh, position);
 
         this.scene.add(packetMesh);
+    }
+
+    addLine(pipe: Pipe, material: LineBasicMaterial, z?: number) {
+        const points = new Geometry();
+        points.vertices.push(pointToVec(pipe.start.pos, z));
+        points.vertices.push(pointToVec(pipe.end.pos, z));
+        this.scene.add(new Line(points, material));
+    }
+
+    addMesh(source: Mesh, point: Point, material?: MeshBasicMaterial, z?: number) {
+        let mesh = new Mesh(source.geometry, material || source.material);
+        translateMesh(mesh, pointToVec(point, z));
+        this.scene.add(mesh);
     }
 }
 
@@ -117,8 +145,8 @@ function translateMesh(mesh: Mesh, vec: Vector3) {
     mesh.translateZ(vec.z);
 }
 
-function pointToVec(point: Point) {
-    return new Vector3(point.x, 0, -point.y);
+function pointToVec(point: Point, z?: number) {
+    return new Vector3(point.x, z || 0, -point.y);
 }
 
 export default Renderer

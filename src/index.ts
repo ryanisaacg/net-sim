@@ -51,6 +51,7 @@ renderer.updateSimulation(region);
 
 const render = function () {
     requestAnimationFrame( render );
+    tcpConnections.forEach(pair => pair.forEach(tcp => renderer.addTcpPipe(tcp)));
     renderer.render();
 };
 
@@ -68,6 +69,14 @@ const updateNode = function (node: NetworkNode) {
     })
 };
 
+let hosts = network.filter((node) => node.addr.node);
+let host = hosts[0]
+let target = hosts[7]
+const toTarget = new TcpConnection(host, target);
+const toHost = new TcpConnection(target, host);
+toTarget.write("Yo can I get uhhh BONELESS PIZZA.");
+tcpConnections.push([toTarget, toHost])
+
 setInterval(update, 20);
 function update () {
     tcpConnections.forEach(([a, b]) => {
@@ -75,13 +84,13 @@ function update () {
         b.tick();
     })
     //const completed = tcpConnections.filter(([a, b]) => a.completed() || b.completed())
-    tcpConnections = tcpConnections.filter(([a, b]) => !(a.completed() || b.completed()))
+    //tcpConnections = tcpConnections.filter(([a, b]) => !(a.completed() || b.completed()))
 
     updateNode(region);
 
     renderer.updateSimulation(region);
 
-    let hosts = network.filter((node) => node.addr.node);
+    /*let hosts = network.filter((node) => node.addr.node);
     hosts.forEach((host) => {
         if(Math.random() < 0.001 && tcpConnections.length < 16) {
             let target = hosts[Math.floor(Math.random() * hosts.length)];
@@ -90,5 +99,5 @@ function update () {
             toTarget.write("Yo can I get uhhh BONELESS PIZZA.");
             tcpConnections.push([toTarget, toHost])
         }
-    });
+    });*/
 }
