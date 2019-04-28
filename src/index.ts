@@ -1,6 +1,7 @@
 import NetworkNode from './network-node';
 //import NetworkPacket from './network-packet';
 import Address from './address';
+import NetworkPacket from './network-packet'
 import Renderer from './renderer';
 import Point from './point';
 import TcpConnection from './tcp-connection'
@@ -70,12 +71,19 @@ const updateNode = function (node: NetworkNode) {
 };
 
 let hosts = network.filter((node) => node.addr.node);
-let host = hosts[0]
-let target = hosts[7]
-const toTarget = new TcpConnection(host, target);
-const toHost = new TcpConnection(target, host);
-toTarget.write("Yo can I get uhhh BONELESS PIZZA.");
-tcpConnections.push([toTarget, toHost])
+[
+    [0, 7],
+    [1, 4],
+    [3, 12],
+    [3, 5],
+].forEach(([hostIndex, targetIndex]) => {
+    let host = hosts[hostIndex]
+    let target = hosts[targetIndex]
+    const toTarget = new TcpConnection(host, target);
+    const toHost = new TcpConnection(target, host);
+    toTarget.write("Yo can I get uhhh BONELESS PIZZA.");
+    tcpConnections.push([toTarget, toHost])
+})
 
 setInterval(update, 20);
 function update () {
@@ -84,20 +92,17 @@ function update () {
         b.tick();
     })
     //const completed = tcpConnections.filter(([a, b]) => a.completed() || b.completed())
-    //tcpConnections = tcpConnections.filter(([a, b]) => !(a.completed() || b.completed()))
+    tcpConnections = tcpConnections.filter(([a, b]) => !(a.completed() && b.completed()))
 
     updateNode(region);
 
     renderer.updateSimulation(region);
 
-    /*let hosts = network.filter((node) => node.addr.node);
     hosts.forEach((host) => {
-        if(Math.random() < 0.001 && tcpConnections.length < 16) {
+        if(Math.random() < 0.001) {
             let target = hosts[Math.floor(Math.random() * hosts.length)];
-            const toTarget = new TcpConnection(host, target);
-            const toHost = new TcpConnection(target, host);
-            toTarget.write("Yo can I get uhhh BONELESS PIZZA.");
-            tcpConnections.push([toTarget, toHost])
+            host.enqueuePacket(new NetworkPacket(host.addr, target.addr, "!Henwo"));
+            host.enqueuePacket(new NetworkPacket(host.addr, target.addr, "!Wowwd"));
         }
-    });*/
+    });
 }

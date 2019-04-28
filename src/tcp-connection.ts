@@ -57,7 +57,7 @@ class TcpConnection {
                 this.sendPacket('A' + this.receive_buffer.length);
             }
         } else if(packetType == 'F') {
-            if(this.conn_status == Status.Closing) {
+            if(this.conn_status == Status.Closing || this.conn_status == Status.Closed) {
                 this.conn_status = Status.Closed;
                 console.log(this)
                 console.log('Sent close 1')
@@ -74,7 +74,9 @@ class TcpConnection {
     }
 
     tick() {
-        if(this.timeout == 0 && this.sent_data != this.send_buffer.length) {
+        this.timeout --;
+        if(this.timeout <= 0 && this.sent_data != this.send_buffer.length) {
+            this.pipe.networkPackets.shift();
             this.sendNext();
         }
         this.pipe.networkPackets = this.pipe.networkPackets.filter(packet => packet.distanceTraveled < this.pipe.length)
