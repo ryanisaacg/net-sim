@@ -65,7 +65,9 @@ class TcpConnection {
         if(this.timeout == 0 && this.sent_data != this.send_buffer.length) {
             this.sendNext();
         }
-        this.pipe.networkPackets = this.pipe.networkPackets.filter(packet => packet.distanceTraveled < this.pipe.length)
+        this.pipe.networkPackets = this.pipe.networkPackets.filter(packet => packet.distanceTraveled < this.pipe.length);
+
+        this.converse();
     }
 
     sendNext() {
@@ -86,6 +88,42 @@ class TcpConnection {
 
     completed() {
         return this.conn_status == Status.Closed;
+    }
+
+    converse() {
+        let markovChain: { [id: string]: any[] } = {
+            "Hello.": [0.2, "Hello.", 0.4, "How are you?", 0.4, "What's up?"],
+            "How are you?": [0.5, "Ok.", 0.1, "Not good.", 0.4, "Fine, how about you?"],
+            "Ok.": [0.3, "Cool.", 0.7, "Yeah I know."],
+            "Fine, how about you?": [0.8, "Ok.", 0.2, "Not good."],
+            "Not good.": [0.2, "Yeah I know.", 0.8, "Oh no! What's up?"],
+            "Cool.": [0.7, "Well, talk to you later?", 0.3, "Ok, talk to you later."],
+            "Yeah I know.": [0.2, "Well, talk to you later?", 0.8, "Ok, talk to you later."],
+            "What's up?": [0.2, "I don't know actually.", 0.5, "Nothing...", 0.3, "Don't wanna talk."],
+            "I don't know actually.": [0.7, "Well, talk to you later?", 0.3, "Ok, talk to you later."],
+            "Nothing.": [0.6, "Well, talk to you later?", 0.4, "Ok, talk to you later."],
+            "Well, talk to you later?": [0.6, "Sure.", 0.4, "Ok, talk to you later."],
+            "Don't wanna talk.": [],
+            "Ok, talk to you later.": [],
+            "Sure.": []
+        };
+
+        for(var phrase in markovChain) {
+            if(this.receive_buffer.endsWith(phrase)) {
+                if(markovChain[phrase] == []) {
+                    // Ready to close
+                } else {
+                    let choice = Math.random();
+                    while((choice -= markovChain[phrase].shift()) >= 0) {
+                        markovChain[phrase].shift();
+                    }
+
+                    this.send_buffer += markovChain[phrase][0];
+                }
+
+                break;
+            }
+        }
     }
 }
 
