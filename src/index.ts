@@ -71,19 +71,19 @@ const updateNode = function (node: NetworkNode) {
 };
 
 let hosts = network.filter((node) => node.addr.node);
-[
-    // [0, 7],
-    // [1, 4],
-    [3, 12],
-    [3, 5],
-].forEach(([hostIndex, targetIndex]) => {
-    let host = hosts[hostIndex]
-    let target = hosts[targetIndex]
-    const toTarget = new TcpConnection(host, target);
-    const toHost = new TcpConnection(target, host);
-    toTarget.write("Hello.");
-    tcpConnections.push([toTarget, toHost])
-})
+// [
+//     // [0, 7],
+//      [1, 4],
+//     // [3, 12],
+//     // [3, 5],
+// ].forEach(([hostIndex, targetIndex]) => {
+//     let host = hosts[hostIndex]
+//     let target = hosts[targetIndex]
+//     const toTarget = new TcpConnection(host, target);
+//     const toHost = new TcpConnection(target, host);
+//     toTarget.write("Hello.");
+//     tcpConnections.push([toTarget, toHost])
+// })
 
 let paused = false;
 const pauseButton = document.getElementById('pause')!;
@@ -98,7 +98,7 @@ pauseButton.onclick = () => {
     }
 }
 
-setInterval(update, 20);
+setInterval(update, 10);
 function update () {
     if(paused) {
         renderer.updateSimulation(region);
@@ -123,8 +123,14 @@ function update () {
             host.enqueuePacket(new NetworkPacket(host.addr, target.addr, "!Wowwd"));
         }
 
-        if(Math.random() < 0.0001) {
-
+        if(Math.random() < 0.00005) {
+            let target = hosts[Math.floor(Math.random() * hosts.length)];
+            if(host != target) {
+                const toTarget = new TcpConnection(host, target);
+                const toHost = new TcpConnection(target, host);
+                toTarget.write("Hello.");
+                tcpConnections.push([toTarget, toHost])
+            }
         }
     });
 }

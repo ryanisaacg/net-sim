@@ -78,7 +78,9 @@ class TcpConnection {
     tick() {
         this.timeout --;
         if(this.timeout <= 0 && this.sent_data != this.send_buffer.length) {
-            this.pipe.networkPackets.shift();
+            if(this.pipe.networkPackets.length > 0 && !this.pipe.networkPackets[0].payload.startsWith("A")) {
+                this.pipe.networkPackets.shift();
+            }
             this.sendNext();
         }
         this.pipe.networkPackets = this.pipe.networkPackets.filter(packet => packet.distanceTraveled < this.pipe.length);
