@@ -44,6 +44,7 @@ const mouse = {
 
 const WIDTH = window.innerWidth * 2 / 3;
 const HEIGHT = window.innerHeight;
+const APP_TIMER = 10;
 
 type Selection = {
     tag: 'app';
@@ -59,6 +60,7 @@ type Selection = {
 };
 
 class Renderer {
+    appTimer: number;
     scene: Scene;
     camera: PerspectiveCamera;
     controls: OrbitControls;
@@ -88,9 +90,15 @@ class Renderer {
         container.appendChild( this.gfx.domElement );
 
         this.raycaster = new Raycaster();
+        this.appTimer = 0;
     }
 
     render() {
+        this.appTimer++;
+        if(this.appTimer > APP_TIMER) {
+            this.appTimer = 0;
+        }
+
         this.controls.update();
 
         // update the picking ray with the camera and mouse position
@@ -170,7 +178,7 @@ class Renderer {
         this.addMesh(HOST, tcp.pipe.end.pos, APP_HOST_MATERIAL, APP_Z);
 
         if(tcp.send_buffer.length > 0 && tcp.sent_data / tcp.send_buffer.length < 1) {
-            this.addPacket(tcp.sent_data / tcp.send_buffer.length * tcp.pipe.length, tcp.pipe, { tag: 'app', tcp }, APP_Z);
+            this.addPacket(tcp.sent_data / tcp.send_buffer.length * tcp.pipe.length * this.appTimer / APP_TIMER, tcp.pipe, { tag: 'app', tcp }, APP_Z);
         }
     }
 
