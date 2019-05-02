@@ -117,7 +117,44 @@ class Renderer {
                 </tr>
                 `
             } else if(this.selected.tag == 'tcp') {
-
+                const payload = this.selected.packet.payload;
+                const typeOfPacket = payload.charAt(0);
+                const data = payload.substring(1);
+                if(typeOfPacket == 'A') {
+                    overlay.innerHTML = `
+                    <tr>
+                        <th> Packet Type </th>
+                        <th> Ack Number </th>
+                    </tr>
+                    <tr>
+                        <td> ACK </td>
+                        <td> ${data} </td>
+                    </tr>
+                    `
+                } else if(typeOfPacket == 'D') {
+                    const [ num, dat ] = data.split('|')
+                    overlay.innerHTML = `
+                    <tr>
+                        <th> Packet Type </th>
+                        <th> Sequence Number </th>
+                        <th> Data </th>
+                    </tr>
+                    <tr>
+                        <td> DAT </td>
+                        <td> ${num} </td>
+                        <td> ${dat} </td>
+                    </tr>
+                    `
+                } else if(typeOfPacket == 'F') {
+                    overlay.innerHTML = `
+                    <tr>
+                        <th> Packet Type</th>
+                    </tr>
+                    <tr>
+                        <td> FIN </td>
+                    </tr>
+                    `
+                }
             } else if(this.selected.tag == 'net') {
                 const packet = this.selected.packet;
                 overlay.innerHTML = `
