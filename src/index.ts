@@ -121,8 +121,8 @@ function update () {
     hosts.forEach((host) => {
         if(Math.random() < 0.001) {
             let target = hosts[Math.floor(Math.random() * hosts.length)];
-            host.enqueuePacket(new NetworkPacket(host.addr, target.addr, "!Henwo"));
-            host.enqueuePacket(new NetworkPacket(host.addr, target.addr, "!Wowwd"));
+            host.enqueuePacket(new NetworkPacket(host.addr, target.addr, "!Hello!"));
+            host.enqueuePacket(new NetworkPacket(host.addr, target.addr, "!World!"));
         }
 
         if(Math.random() < 0.00005) {
