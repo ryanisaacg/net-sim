@@ -110,10 +110,10 @@ class Renderer {
             if(this.selected.tag == 'app') {
                 overlay.innerHTML = `
                 <tr>
-                    <th> Message </th>
+                    <th> One-Sided Message History </th>
                 </tr>
                 <tr>
-                    <td> ${this.selected.tcp.send_buffer} </td>
+                    <td style="white-space: pre-line"> ${this.selected.tcp.send_buffer} </td>
                 </tr>
                 `
             } else if(this.selected.tag == 'tcp') {
