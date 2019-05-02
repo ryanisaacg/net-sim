@@ -47,12 +47,13 @@ network.push(new NetworkNode(new Point(200, -150), c1));
 network.push(new NetworkNode(new Point(150, -200), c2));
 
 let tcpConnections: TcpConnection[][] = []
+let time = 0;
 
 renderer.updateSimulation(region);
 
 const render = function () {
     requestAnimationFrame( render );
-    tcpConnections.forEach(pair => pair.forEach(tcp => renderer.addTcpPipe(tcp)));
+    tcpConnections.forEach(pair => pair.forEach(tcp => renderer.addTcpPipe(tcp, time)));
     renderer.render();
 };
 
@@ -104,6 +105,7 @@ function update () {
         renderer.updateSimulation(region);
         return;
     }
+    time++;
 
     tcpConnections.forEach(([a, b]) => {
         a.tick();
