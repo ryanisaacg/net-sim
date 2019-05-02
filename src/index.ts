@@ -130,7 +130,7 @@ function update () {
             if(host != target) {
                 const toTarget = new TcpConnection(host, target);
                 const toHost = new TcpConnection(target, host);
-                toTarget.write("Hello.");
+                toTarget.write("Hello.\n");
                 tcpConnections.push([toTarget, toHost])
             }
         }
