@@ -110,24 +110,39 @@ class Renderer {
             if(mesh.geometry.id == PACKET.geometry.id) {
                 mesh.material = HOST_MATERIAL;
                 this.selected = <Selection>child.object.userData;
-                const overlay = document.getElementById('overlay')!;//.innerHTML = child.object.userData.tag;
-
-                if(this.selected.tag == 'app') {
-                    overlay.innerHTML = `
-                    <tr>
-                        <th> Message </th>
-                    </tr>
-                    <tr>
-                        <td> ${this.selected.tcp.send_buffer} </td>
-                    </tr>
-                    `
-                } else if(this.selected.tag == 'tcp') {
-
-                } else if(this.selected.tag == 'net') {
-
-                }
             }
         });
+        if(this.selected) {
+            const overlay = document.getElementById('overlay')!;//.innerHTML = child.object.userData.tag;
+            if(this.selected.tag == 'app') {
+                overlay.innerHTML = `
+                <tr>
+                    <th> Message </th>
+                </tr>
+                <tr>
+                    <td> ${this.selected.tcp.send_buffer} </td>
+                </tr>
+                `
+            } else if(this.selected.tag == 'tcp') {
+
+            } else if(this.selected.tag == 'net') {
+                const packet = this.selected.packet;
+                overlay.innerHTML = `
+                <tr>
+                    <th> Src </th>
+                    <th> Dest </th>
+                    <th> Age </th>
+                    <th> Progress </th>
+                </tr>
+                <tr>
+                    <td> ${packet.source.toString()} </td>
+                    <td> ${packet.dest.toString()} </td>
+                    <td> ${packet.distanceTraveled} </td>
+                    <td> ${packet.progress === 0 ? 'Complete' : packet.progress} </td>
+                </tr>
+                `
+            }
+        }
 
         // Render the scene
         this.gfx.render(this.scene, this.camera);

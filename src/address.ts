@@ -29,6 +29,10 @@ class Address {
             this.institution == other.institution &&
             this.node == other.node
     }
+
+    toString() {
+        return "" + this.region + '.' + (this.local || '0') + '.' + (this.institution || '0') + '.' + (this.node || '0')
+    }
 }
 
 export default Address
