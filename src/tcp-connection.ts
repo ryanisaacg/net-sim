@@ -104,20 +104,20 @@ class TcpConnection {
 
     converse() {
         let markovChain: { [id: string]: any[] } = {
-            "Hello.": [0.2, "Hello.", 0.4, "How are you?", 0.4, "What's up?"],
-            "How are you?": [0.5, "Ok.", 0.1, "Not good.", 0.4, "Fine, how about you?"],
-            "Ok.": [0.3, "Cool.", 0.7, "Yeah I know."],
-            "Fine, how about you?": [0.8, "Ok.", 0.2, "Not good."],
-            "Not good.": [0.2, "Yeah I know.", 0.8, "Oh no! What's up?"],
-            "Cool.": [0.7, "Well, talk to you later?", 0.3, "Ok, talk to you later."],
-            "Yeah I know.": [0.2, "Well, talk to you later?", 0.8, "Ok, talk to you later."],
-            "What's up?": [0.2, "I don't know actually.", 0.5, "Nothing...", 0.3, "Don't wanna talk."],
-            "I don't know actually.": [0.7, "Well, talk to you later?", 0.3, "Ok, talk to you later."],
-            "Nothing.": [0.6, "Well, talk to you later?", 0.4, "Ok, talk to you later."],
-            "Well, talk to you later?": [0.6, "Sure.", 0.4, "Ok, talk to you later."],
-            "Don't wanna talk.": [-1],
-            "Ok, talk to you later.": [-1],
-            "Sure.": [-1]
+            "Hello.\n": [0.2, "Hello.\n", 0.4, "How are you?\n", 0.4, "What's up?\n"],
+            "How are you?\n": [0.5, "Ok.\n", 0.1, "Not good.\n", 0.4, "Fine, how about you?\n"],
+            "Ok.\n": [0.3, "Cool.\n", 0.7, "Yeah I know.\n"],
+            "Fine, how about you?\n": [0.8, "Ok.\n", 0.2, "Not good.\n"],
+            "Not good.\n": [0.2, "Yeah I know.\n", 0.8, "Oh no! What's up?\n"],
+            "Cool.\n": [0.7, "Well, talk to you later?\n", 0.3, "Ok, talk to you later.\n"],
+            "Yeah I know.\n": [0.2, "Well, talk to you later?\n", 0.8, "Ok, talk to you later.\n"],
+            "What's up?\n": [0.2, "I don't know actually.\n", 0.5, "Nothing...\n", 0.3, "Don't wanna talk.\n"],
+            "I don't know actually.\n": [0.7, "Well, talk to you later?\n", 0.3, "Ok, talk to you later.\n"],
+            "Nothing.\n": [0.6, "Well, talk to you later?\n", 0.4, "Ok, talk to you later.\n"],
+            "Well, talk to you later?\n": [0.6, "Sure.\n", 0.4, "Ok, talk to you later.\n"],
+            "Don't wanna talk.\n": [-1],
+            "Ok, talk to you later.\n": [-1],
+            "Sure.\n": [-1]
         };
 
         for(var phrase in markovChain) {
