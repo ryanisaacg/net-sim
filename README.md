@@ -1,4 +1,5 @@
 # Network Simulator
+Partners: Ryan Cirincione & Ryan Goldstein
 
 ## What is the Project?
 
